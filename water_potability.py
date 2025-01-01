@@ -1,5 +1,7 @@
 import streamlit as st
+import pandas as pd
 import numpy as np
+from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
@@ -22,34 +24,49 @@ Organic_carbon = st.number_input("Organic Carbon (ppm)", min_value=0.0, value=10
 Trihalomethanes = st.number_input("Trihalomethanes (ppb)", min_value=0.0, value=80.0, step=0.1)
 Turbidity = st.number_input("Turbidity (NTU)", min_value=0.0, value=5.0, step=0.1)
 
-# Simulasi scaler dan model (untuk contoh, sesuaikan dengan model yang telah dilatih)
-scaler = MinMaxScaler()
-best_model = RandomForestClassifier(random_state=42)
+# Membaca data dari file
+file_path = 'water_potability.csv'  # Ganti dengan path dataset Anda
+try:
+    data = pd.read_csv(file_path)
+    X = data[["ph", "Hardness", "Solids", "Chloramines", "Sulfate", "Conductivity", "Organic_carbon", "Trihalomethanes", "Turbidity"]]
+    y = data["Potability"]
 
-# Data dummy untuk melatih model (gunakan dataset asli pada implementasi)
-dummy_data = np.random.rand(100, 9)
-dummy_labels = np.random.randint(0, 2, 100)
-scaler.fit(dummy_data)
-best_model.fit(scaler.transform(dummy_data), dummy_labels)
+    # Membagi data menjadi pelatihan dan pengujian
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-# Menghitung akurasi model dengan data dummy
-accuracy = accuracy_score(dummy_labels, best_model.predict(scaler.transform(dummy_data)))
+    # Normalisasi data
+    scaler = MinMaxScaler()
+    X_train_scaled = scaler.fit_transform(X_train)
+    X_test_scaled = scaler.transform(X_test)
 
-# Tombol untuk prediksi
-if st.button("Prediksi Kelayakan Air"):
-    # Membentuk array input pengguna
-    user_input = np.array([[ph, Hardness, Solids, Chloramines, Sulfate, Conductivity, Organic_carbon, Trihalomethanes, Turbidity]])
-    user_input_scaled = scaler.transform(user_input)
+    # Melatih model
+    best_model = RandomForestClassifier(random_state=42)
+    best_model.fit(X_train_scaled, y_train)
 
-    # Prediksi menggunakan model
-    prediction = best_model.predict(user_input_scaled)
+    # Evaluasi model
+    y_pred = best_model.predict(X_test_scaled)
+    accuracy = accuracy_score(y_test, y_pred)
 
-    # Menampilkan hasil prediksi
-    if prediction[0] == 1:
-        st.success("Air ini layak untuk diminum.")
-    else:
-        st.error("Air ini tidak layak untuk diminum.")
+    # Tombol untuk prediksi
+    if st.button("Prediksi Kelayakan Air"):
+        # Membentuk array input pengguna
+        user_input = np.array([[ph, Hardness, Solids, Chloramines, Sulfate, Conductivity, Organic_carbon, Trihalomethanes, Turbidity]])
+        user_input_scaled = scaler.transform(user_input)
 
-# Menampilkan akurasi model saat ini
-st.write("### Akurasi Model Random Forest Saat Ini:")
-st.write(f"{accuracy * 100:.2f}%")
+        # Prediksi menggunakan model
+        prediction = best_model.predict(user_input_scaled)
+
+        # Menampilkan hasil prediksi
+        if prediction[0] == 1:
+            st.success("Air ini layak untuk diminum.")
+        else:
+            st.error("Air ini tidak layak untuk diminum.")
+
+    # Menampilkan akurasi model saat ini
+    st.write("### Akurasi Model Random Forest Saat Ini:")
+    st.write(f"{accuracy * 100:.2f}%")
+
+except FileNotFoundError:
+    st.error(f"Dataset tidak ditemukan di lokasi: {file_path}. Pastikan file tersedia.")
+except Exception as e:
+    st.error(f"Terjadi kesalahan: {e}")
