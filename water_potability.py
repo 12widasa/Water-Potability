@@ -110,14 +110,13 @@ for i, feature in enumerate(features):
         st.pyplot(fig_hist)
 
 # Step 6: Konstruksi Data (Penskalaan Data)
-st.header("6. Konstruksi Data (Penskalaan Data)")
+st.header("6-8. Modeling dan Evaluasi")
 
 # Preprocessing
 scaler = MinMaxScaler()
 X_resampled_scaled = scaler.fit_transform(X_resampled)
 
 # Step 7: Pemodelan
-st.header("7. Pemodelan")
 # Split data (dengan data sudah dinormalisasi sebelumnya)
 X_train, X_test, y_train, y_test = train_test_split(X_resampled_scaled, y_resampled, 
                                                     test_size=0.2, random_state=42)
@@ -133,7 +132,6 @@ models = {
 }
 
 # Step 8: Evaluasi Model
-st.header("8. Evaluasi Model")
 # Train dan evaluasi model
 results_normalized = {}
 results_raw = {}
