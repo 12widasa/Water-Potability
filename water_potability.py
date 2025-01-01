@@ -19,10 +19,10 @@ from xgboost import XGBClassifier
 from catboost import CatBoostClassifier
 
 # Set page config
-st.set_page_config(page_title="Water Quality Analysis", layout="wide")
+st.set_page_config(page_title="Water Quality", layout="wide")
 
 # Title
-st.title("Analisis Kualitas Air")
+st.title("Klasifikasi Data Kualitas Air dan Kelayakan Minum")
 
 # Step 1: Pengumpulan Data
 st.header("1. Pengumpulan Data")
