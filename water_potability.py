@@ -185,6 +185,42 @@ for i, (model, matrix) in enumerate(conf_matrices.items()):
 # Navigasi ke direktori tempat file app.py berada
 # Jalankan perintah: streamlit run app.py
 
+#add prediction :
+
+# Menambahkan Input untuk Prediksi Potability
+st.header("Prediksi Kelayakan Air Minum")
+st.write("Masukkan nilai untuk masing-masing fitur di bawah ini, lalu klik tombol prediksi untuk mengetahui apakah air layak diminum.")
+
+# Input untuk setiap fitur
+ph = st.number_input("pH (0-14)", min_value=0.0, max_value=14.0, value=7.0, step=0.1)
+Hardness = st.number_input("Hardness (mg/L)", min_value=0.0, value=200.0, step=0.1)
+Solids = st.number_input("Solids (ppm)", min_value=0.0, value=10000.0, step=0.1)
+Chloramines = st.number_input("Chloramines (ppm)", min_value=0.0, value=4.0, step=0.1)
+Sulfate = st.number_input("Sulfate (mg/L)", min_value=0.0, value=250.0, step=0.1)
+Conductivity = st.number_input("Conductivity (μS/cm)", min_value=0.0, value=500.0, step=0.1)
+Organic_carbon = st.number_input("Organic Carbon (ppm)", min_value=0.0, value=10.0, step=0.1)
+Trihalomethanes = st.number_input("Trihalomethanes (ppb)", min_value=0.0, value=80.0, step=0.1)
+Turbidity = st.number_input("Turbidity (NTU)", min_value=0.0, value=5.0, step=0.1)
+
+# Tombol untuk prediksi
+if st.button("Prediksi Kelayakan Air"):
+    # Membentuk array input pengguna
+    user_input = np.array([[ph, Hardness, Solids, Chloramines, Sulfate, Conductivity, Organic_carbon, Trihalomethanes, Turbidity]])
+
+    # Melakukan penskalaan data
+    user_input_scaled = scaler.transform(user_input)
+
+    # Menggunakan model terbaik (misalnya Random Forest) untuk prediksi
+    best_model = models['Random Forest']
+    prediction = best_model.predict(user_input_scaled)
+
+    # Menampilkan hasil prediksi
+    if prediction[0] == 1:
+        st.success("Air ini layak untuk diminum.")
+    else:
+        st.error("Air ini tidak layak untuk diminum.")
+
+
 # Kesimpulan
 st.header("Kesimpulan dari Hasil Analisis")
 st.write("Berdasarkan hasil analisis perbandingan algoritma yang digunakan, berikut adalah kesimpulan:")
